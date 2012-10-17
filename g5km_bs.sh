@@ -21,7 +21,7 @@
 set -x
 
 PISM=$WORK/pism/software/pism-dev/build/pismr
-BOOTFILE=$WORK/pism/pism_Antarctica_5km.nc
+BOOTFILE=$WORK/pism/pism_Greenland_5km_v1.1.nc
 OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
 
 SKIP="-skip -skip_max 200"
