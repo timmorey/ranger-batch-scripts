@@ -10,7 +10,7 @@
 
 set -x
 
-PISM=$HOME/pism/pism-dev/build/pismr
+PISM=$WORK/pism/software/pism-dev/build/pismr
 BOOTFILE=$WORK/pism/pism_Antarctica_5km.nc
 OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
 
