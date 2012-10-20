@@ -1,10 +1,12 @@
 #!/bin/bash
 
 ##
-# g1km_bs.sh - Created by Timothy Morey on 10/16/2012
+# g1km.sh - Created by Timothy Morey on 10/20/2012
 #
-# This file defines a ranger batch that will do a bootstrap load of 1km
-# Greenland data and then immediately save its state.
+# This file defines a ranger batch that will do a normal run of 1km Greenland
+# data, picking up where the g1km_bs.sh run left off.  It just loads the saved
+# model state, fills in diagnostic quantities, and then immediately saves its
+# state.
 #
 # The batch name, node count, and wayness are not defined in this file, so that
 # they may easily be varied for a parameter sweep by passing them directly to
@@ -23,21 +25,19 @@
 set -x
 
 PISM=$WORK/pism/software/pism-dev/build/pismr
-BOOTFILE=$WORK/pism/pism_Greenland1km.nc
+INFILE=$WORK/pism/g1km.nc4.nc
 OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
 
 mkdir $OUTDIR
 
-for i in 1 2 3
+for i in 1
 do
 	/usr/bin/time -p ibrun $PISM \
-		-boot_file $BOOTFILE \
+		-i $INFILE \
 		-ocean_kill \
-		-Lz 4000 -Lbz 2000 -z_spacing equal \
-		-Mx 1501 -My 2801 -Mz 401 -Mbz 41 \
 		-atmosphere searise_greenland \
 		-surface pdd \
-		-o_format netcdf4_parallel -o $OUTDIR/bootstrapped1km.nc4.$i.nc \
+		-o_format netcdf4_parallel -o $OUTDIR/g1km.nc4.$i.nc \
 		-y 0 \
 		-log_summary
 done
