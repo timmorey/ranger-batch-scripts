@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##
-# g1km.sh - Created by Timothy Morey on 10/17/2012.
+# g1km_cdf5.sh - Created by Timothy Morey on 11/30/2012.
 #
 # This file provides a ranger batch script that will do a PISM run using 1km 
 # Greenland data.  The parameters used in this file are based on the parameters 
@@ -14,7 +14,7 @@
 #$ -j y
 #$ -o o.$JOB_NAME.$JOB_ID
 #$ -q normal
-#$ -N g1km_testp
+#$ -N g1km_cdf5
 #$ -pe 4way 1024
 #$ -l h_rt=02:00:00
 #$ -M timmorey@gmail.com
@@ -22,17 +22,16 @@
 
 #set -x
 
+INDIR=$SCRATCH/input-c16-s1M
 PISMDIR=$WORK/pism/intel/pism-dev/build-cdf5-v2
 PISM=$PISMDIR/pismr
-CONFIG="-config $PISMDIR/pism_config.nc"
-CONFIGOVERRIDE="-config_override $WORK/pism/searise_config.nc"
-INDIR=$WORK/pism
-OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
+CONFIG="-config $INDIR/pism_config.nc"
+CONFIGOVERRIDE="-config_override $INDIR/searise_config.nc"
+OUTDIR=$SCRATCH/output-c16-s1M/$JOB_NAME.$JOB_ID 
 
 SKIP="-skip -skip_max 2000"
 COUPLER="-atmosphere searise_greenland -surface pdd -pdd_annualize -ocean constant"
 OPTS="$SKIP $COUPLER $CONFIG $CONFIGOVERRIDE -bed_def lc -ssa_sliding -thk_eff -topg_to_phi 5.0,20.0,-300.0,700.0 -ocean_kill -acab_cumulative -y 0"
-#OPTS="$SKIP $COUPLER $CONFIG $CONFIGOVERRIDE -y 0"
 
 mkdir $OUTDIR
 

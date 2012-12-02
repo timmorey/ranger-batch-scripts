@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##
-# a10km.sh - Created by Timothy Morey on 10/17/2012
+# a10km_lustre.sh - Created by Timothy Morey on 11/28/2012
 #
 # This script does a run based on the first control run from the
 # examples/searise-antarctica/experiments.sh file distributed with PISM.
@@ -12,20 +12,19 @@
 #$ -j y
 #$ -o o.$JOB_NAME.$JOB_ID
 #$ -q development 
-#$ -N a10km
-#$ -pe 4way 256
+#$ -N a10km_lustre
+#$ -pe 4way 64
 #$ -l h_rt=00:30:00
 #$ -M timmorey@gmail.com
 #$ -m be
 
 #set -x
 
-INDIR=$SCRATCH/input-c16-s1M
-OUTDIR=$SCRATCH/output-c16-s1M
-PISMDIR=$WORK/pism/intel/pism-improving-io/build
+PISMDIR=$WORK/pism/intel/pism-dev/build
 PISM=$PISMDIR/pismr
-CONFIGFILE=$INDIR/pism_config.nc
-INFILE=$INDIR/a10km.cdf1.nc
+CONFIGFILE=$PISMDIR/pism_config.nc
+INFILE=$SCRATCH/input-c16-s1M/a10km.cdf1.nc
+OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
 
 SKIP="-skip 10"
 SIA_ENHANCEMENT="-e 5.6"
@@ -38,24 +37,26 @@ mkdir $OUTDIR
 
 for i in 1 2 3 4 5
 do
-	/usr/bin/time -p ibrun $PISM $OPTS \
-		-config $CONFIGFILE \
-		-i $INFILE \
-		-o_format netcdf3 -o $OUTDIR/a10km.nc3.cdf1.$i.nc \
-		-log_summary
+
+	export PISM_ECHO_HINTS=true
+	export PISM_MPIIO_HINTS="use_pism_customizations=1"
 
 	/usr/bin/time -p ibrun $PISM $OPTS \
 		-config $CONFIGFILE \
 		-i $INFILE \
-		-o_format netcdf4_parallel -o $OUTDIR/a10km.hdf5.$i.nc \
+		-o_format pnetcdf -o $OUTDIR/a10km.$i.opt.cdf5.nc \
 		-log_summary
 
-	/usr/bin/time -p ibrun $PISM $OPTS \
-		-config $CONFIGFILE \
-		-i $INFILE \
-		-o_format pnetcdf -o $OUTDIR/a10km.cdf5.$i.nc \
-		-log_summary
+        export PISM_MPIIO_HINTS="use_pism_customizations=0"
+
+        /usr/bin/time -p ibrun $PISM $OPTS \
+                -config $CONFIGFILE \
+                -i $INFILE \
+                -o_format pnetcdf -o $OUTDIR/a10km.$i.cdf5.nc \
+                -log_summary
+
+
 done
 
-rm -rf $OUTDIR
+#rm -rf $OUTDIR
 
