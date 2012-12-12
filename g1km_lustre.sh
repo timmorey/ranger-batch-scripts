@@ -20,15 +20,15 @@
 
 #set -x
 
-PISMDIR=$WORK/pism/intel/pism-dev/build
-PISM=$PISMDIR/pismr
-CONFIGFILE=$PISMDIR/pism_config.nc
-INFILE=$SCRATCH/input-c16-s1M/g1km_0_ftt.cdf5.nc
-OUTDIR=$SCRATCH/output-c16-s1M/$JOB_NAME.$JOB_ID 
+PISM=$WORK/pism/intel/pism-dev/build/pismr
+INDIR=$SCRATCH/input-c16-s1M/g1km_0_ftt.cdf5.nc
+INFILE=$INDIR/g1km_0_ftt.cdf5.nc
+OUTDIR=$SCRATCH/output-c128-s1M/$JOB_NAME.$JOB_ID 
 
+CONFIG="-config $INDIR/pism_config.nc"
 SKIP="-skip -skip_max 2000"
 COUPLER="-atmosphere searise_greenland -surface pdd -pdd_annualize -ocean constant"
-OPTS="$SKIP $COUPLER $CONFIG $CONFIGOVERRIDE -bed_def lc -ssa_sliding -thk_eff -topg_to_phi 5.0,20.0,-300.0,700.0 -ocean_kill -acab_cumulative -y 0"
+OPTS="$SKIP $COUPLER $CONFIG -bed_def lc -ssa_sliding -thk_eff -topg_to_phi 5.0,20.0,-300.0,700.0 -ocean_kill -acab_cumulative -y 0"
 
 mkdir $OUTDIR
 
@@ -39,7 +39,6 @@ do
 	export PISM_MPIIO_HINTS="use_pism_customizations=1"
 
 	/usr/bin/time -p ibrun $PISM $OPTS \
-		-config $CONFIGFILE \
 		-i $INFILE \
 		-o_format pnetcdf -o $OUTDIR/g1km.$i.opt.cdf5.nc \
 		-log_summary
@@ -47,7 +46,6 @@ do
         export PISM_MPIIO_HINTS="use_pism_customizations=0"
 
         /usr/bin/time -p ibrun $PISM $OPTS \
-                -config $CONFIGFILE \
                 -i $INFILE \
                 -o_format pnetcdf -o $OUTDIR/g1km.$i.cdf5.nc \
                 -log_summary
