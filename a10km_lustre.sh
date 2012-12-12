@@ -13,7 +13,7 @@
 #$ -o o.$JOB_NAME.$JOB_ID
 #$ -q development 
 #$ -N a10km_lustre
-#$ -pe 4way 64
+#$ -pe 4way 256
 #$ -l h_rt=00:30:00
 #$ -M timmorey@gmail.com
 #$ -m be
@@ -22,9 +22,10 @@
 
 PISMDIR=$WORK/pism/intel/pism-dev/build
 PISM=$PISMDIR/pismr
-CONFIGFILE=$PISMDIR/pism_config.nc
-INFILE=$SCRATCH/input-c16-s1M/a10km.cdf1.nc
-OUTDIR=$SCRATCH/$JOB_NAME.$JOB_ID 
+INDIR=$SCRATCH/input-c16-s1M
+OUTDIR=$SCRATCH/output-c16-s1M/$JOB_NAME.$JOB_ID 
+INFILE=$INDIR/a10km.cdf1.nc
+CONFIGFILE=$INDIR/pism_config.nc
 
 SKIP="-skip 10"
 SIA_ENHANCEMENT="-e 5.6"
