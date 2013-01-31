@@ -18,7 +18,7 @@
 #$ -M timmorey@gmail.com
 #$ -m be
 
-#set -x
+set -x
 
 PISMDIR=$WORK/pism/intel/pism-dev/build
 PISM=$PISMDIR/pismr
@@ -35,18 +35,21 @@ FULLPHYS="-ssa_sliding -thk_eff -pseudo_plastic_q 0.25 -plastic_pwfrac 0.97 -top
 OPTS="$SKIP $SIA_ENHANCEMENT $PIKPHYS_COUPLING $PIKPHYS $FULLPHYS -y 0"
 
 mkdir $OUTDIR
+export PISM_ECHO_HINTS=true
 
 for i in 1 2 3 4 5
 do
+	for co in 1 2 4
+	do
+		export PISM_MPIIO_HINTS="use_pism_customizations=1:pism_co_ratio=$co"
 
-	export PISM_ECHO_HINTS=true
-	export PISM_MPIIO_HINTS="use_pism_customizations=1"
-
-	/usr/bin/time -p ibrun $PISM $OPTS \
-		-config $CONFIGFILE \
-		-i $INFILE \
-		-o_format pnetcdf -o $OUTDIR/a10km.$i.opt.cdf5.nc \
-		-log_summary
+		PISM_MPIIO_HINTS="use_pism_customizations=1:pism_co_ratio=$co" \
+			/usr/bin/time -p ibrun $PISM $OPTS \
+			-config $CONFIGFILE \
+			-i $INFILE \
+			-o_format pnetcdf -o $OUTDIR/a10km.$i.$co.opt.cdf5.nc \
+			-log_summary
+	done
 
         export PISM_MPIIO_HINTS="use_pism_customizations=0"
 
@@ -59,5 +62,5 @@ do
 
 done
 
-#rm -rf $OUTDIR
+rm -rf $OUTDIR
 
